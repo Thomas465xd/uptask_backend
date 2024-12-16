@@ -9,21 +9,25 @@ declare global {
     }
 }
 
-export async function projectExists( req: Request, res: Response, next: NextFunction ) {
+export async function projectExists(req: Request, res: Response, next: NextFunction) {
     try {
-        const { id } = req.params
-        const project = await Project.findById(id)
+        const id = req.params.id || req.params.projectId; // Dynamically fetch the parameter
 
-        if(!project) {
-            const error = new Error("Project not found")
-            res.status(404).json({error: error.message})
-            return
+        if (!id) {
+            return res.status(400).json({ error: "Project ID is missing" });
         }
 
-        req.project = project
+        const project = await Project.findById(id);
 
-        next()
+        if (!project) {
+            return res.status(404).json({ error: "Project not found" });
+        }
+
+        req.project = project;
+
+        next();
     } catch (error) {
-        res.status(500).json({error: "Internal server error"})
+        console.error("Error in projectExists middleware:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
 }

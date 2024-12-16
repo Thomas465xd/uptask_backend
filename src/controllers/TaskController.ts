@@ -54,7 +54,7 @@ export class TaskController {
             res.status(201).json({ message: "Task status updated successfully", task }); // Respuesta con código 201 Created
 
         } catch (error) {
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
@@ -70,7 +70,7 @@ export class TaskController {
             res.status(201).json({ message: "Task updated successfully", task });
 
         } catch (error) {
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
