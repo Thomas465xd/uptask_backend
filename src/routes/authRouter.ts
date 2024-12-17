@@ -23,4 +23,21 @@ router.post("/create-account",
     AuthController.createAccount
 );
 
+router.post("/confirm-account", 
+    body("token")
+        .notEmpty().withMessage("token is required"),
+    handleInputErrors, 
+    AuthController.confirmAccount
+)
+
+router.post("/login", 
+    body("email")
+        .notEmpty().withMessage("email is required")
+        .isEmail().withMessage("email is not valid"),
+    body("password")
+        .notEmpty().withMessage("password is required"), 
+    handleInputErrors, 
+    AuthController.login
+)
+
 export default router
