@@ -19,7 +19,7 @@ export class AuthController {
 
             if (userExists) {
                 const error = new Error("User already exists");
-                res.status(409).json({ error: error.message });
+                res.status(409).json({ message: error.message });
                 return;
             }
 
@@ -47,7 +47,7 @@ export class AuthController {
 
             res.status(201).json({ message: "Account created successfully, please check your email to confirm your account" });
         } catch (error) {
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
@@ -58,7 +58,7 @@ export class AuthController {
 
             if(!tokenExists) {
                 const error = new Error("Invalid Token")
-                res.status(404).json({ error: error.message });
+                res.status(404).json({ message: error.message });
                 return;
             }
 
@@ -72,7 +72,7 @@ export class AuthController {
 
             res.status(200).json({ message: "Account confirmed successfully" });
         } catch (error) {
-            res.status(500).json({ error: "Internal server error" });
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
@@ -84,7 +84,7 @@ export class AuthController {
 
             if(!user) {
                 const error = new Error("User not found")
-                res.status(404).json({ error: error.message })
+                res.status(404).json({ message: error.message })
                 return;
             }
 
@@ -108,7 +108,7 @@ export class AuthController {
                 ])
 
                 const error = new Error("Account not confirmed, please check your email to confirm your account")
-                res.status(401).json({ error: error.message })
+                res.status(401).json({ message: error.message })
                 return;
             }
 
@@ -116,7 +116,7 @@ export class AuthController {
 
             if(!isMatch) {
                 const error = new Error("Invalid Credentials");
-                res.status(401).json({ error: error.message });
+                res.status(401).json({ message: error.message });
                 return;
             }
 
@@ -124,7 +124,81 @@ export class AuthController {
 
         } catch (error) {
             const errorMessage = error.message || "Internal server error";
-            res.status(500).json({ error: errorMessage });
+            res.status(500).json({ message: errorMessage });
+        }
+    }
+
+    static requestConfirmationEmail = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body
+
+            // Verificar si existe el usuario
+            const user = await User.findOne({ email });
+            if(!user) {
+                const error = new Error("User does not exist")
+                res.status(404).json({ message: error.message })
+                return;
+            }
+
+            // Verify if the user is already confirmed
+            if(user.confirmed) {
+                const error = new Error("User already confirmed")
+                res.status(409).json({ message: error.message })
+                return;
+            }
+
+            // Generate a confirmation token
+            const token = new Token()
+            
+            token.token = generateToken()
+            token.user = user.id
+
+            // Send the confirmation email
+            AuthEmail.sendConfirmationEmail({
+                email: user.email, 
+                name: user.name, 
+                token: token.token
+            })
+
+            await Promise.allSettled([
+                token.save(),
+            ])
+
+            res.status(200).json({ message: "Confirmation email sent successfully" });
+        } catch (error) {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    static forgotPassword = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body
+
+            // Verificar si existe el usuario
+            const user = await User.findOne({ email });
+            if(!user) {
+                const error = new Error("User does not exist")
+                res.status(404).json({ message: error.message })
+                return;
+            }
+
+            // Generate a confirmation token
+            const token = new Token()
+            
+            token.token = generateToken()
+            token.user = user.id
+            await token.save()
+
+            // Send the confirmation email
+            AuthEmail.sendResetPasswordEmail({
+                email: user.email, 
+                name: user.name, 
+                token: token.token
+            })
+
+            res.status(200).json({ message: "Reset password email sent successfully" });
+        } catch (error) {
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 }

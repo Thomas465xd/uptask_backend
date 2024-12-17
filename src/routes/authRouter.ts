@@ -40,4 +40,20 @@ router.post("/login",
     AuthController.login
 )
 
+router.post("/request-code", 
+    body("email")
+        .notEmpty().withMessage("email is required")
+        .isEmail().withMessage("email is not valid"),
+    handleInputErrors, 
+    AuthController.requestConfirmationEmail
+)
+
+router.post("/forgot-password", 
+    body("email")
+        .notEmpty().withMessage("email is required")
+        .isEmail().withMessage("email is not valid"),
+    handleInputErrors, 
+    AuthController.forgotPassword
+)
+
 export default router
