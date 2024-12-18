@@ -6,7 +6,11 @@ export class ProjectController {
     // Get all projects
     static getAllProjects = async (req: Request, res: Response) => {
         try {
-            const projects = await Project.find({});
+            const projects = await Project.find({
+                $or: [
+                    { manager: {$in: req.user.id} }, // Projects where the user is the manager
+                ]
+            });
             res.status(200).json(projects);  // Respuesta con código 200 OK
         } catch (error) {
             console.error(error);
@@ -24,6 +28,12 @@ export class ProjectController {
             if(!project) {
                 const error = new Error("Project not found");
                 res.status(404).json({ error: error.message });
+                return;
+            }
+
+            if(project.manager.toString() !== req.user.id.toString()) {
+                const error = new Error("Action not allowed");
+                res.status(403).json({ error: error.message });
                 return;
             }
 
@@ -57,6 +67,12 @@ export class ProjectController {
         try {
             const project = req.project
 
+            if(project.manager.toString() !== req.user.id.toString()) {
+                const error = new Error("Only the Manager can update the project");
+                res.status(403).json({ error: error.message });
+                return;
+            }
+
             project.projectName = req.body.projectName;
             project.projectDescription = req.body.projectDescription;
             project.clientName = req.body.clientName;
@@ -79,6 +95,12 @@ export class ProjectController {
             if(!project) {
                 const error = new Error("Project not found");
                 res.status(404).json({ error: error.message });
+                return;
+            }
+
+            if(project.manager.toString() !== req.user.id.toString()) {
+                const error = new Error("Only the Manager can delete the project");
+                res.status(403).json({ error: error.message });
                 return;
             }
 

@@ -9,6 +9,9 @@ import { authenticate } from "../middleware/auth";
 
 const router = Router();
 
+/* Middleware */
+router.use(authenticate);
+
 /* Routes for Projects */
 router.param("id", projectExists);
 
@@ -24,7 +27,6 @@ router.get("/:id",
 
 // Create a Project
 router.post("/",
-    authenticate,
     body("projectName")
         .notEmpty().withMessage("projectName is required"),
     body("projectDescription")

@@ -12,33 +12,48 @@ declare global {
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        //console.log(req.headers.authorization)
-        const bearerToken = req.headers.authorization.split(" ")[1];
+        const authHeader = req.headers.authorization;
 
-        if(!bearerToken) {
-            const error = new Error("Authentication token is missing");
-            res.status(401).json({ error: error.message });
+        // Validar existencia del header
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            res.status(401).json({ error: "Authentication token is missing or malformed" });
+            return;
         }
 
-        const decoded = jwt.verify(bearerToken, process.env.JWT_SECRET);
-        //console.log(decoded)
+        const token = authHeader.split(" ")[1];
 
-        if(typeof decoded === "object" && decoded.id) {
-            const user = await User.findById(decoded.id).select("_id name email");
-            // console.log(user)
+        // Verificar token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET) as { id: string };
 
-            if(!user) {
-                const error = new Error("User not found");
-                res.status(401).json({ error: error.message });
-                return;
-            }
-
-            req.user = user;
+        if (!decoded || !decoded.id) {
+            res.status(401).json({ error: "Invalid token" });
+            return;
         }
 
+        // Buscar usuario en la base de datos
+        const user = await User.findById(decoded.id).select("_id name email");
+
+        if (!user) {
+            res.status(404).json({ error: "User not found" });
+            return;
+        }
+
+        // Agregar usuario a la petición
+        req.user = user;
 
         next();
     } catch (error) {
-        res.status(500).json({ message: "Internal server error" });
+        if (error.name === "JsonWebTokenError") {
+            res.status(401).json({ error: "Invalid token" });
+            return;
+        }
+        if (error.name === "TokenExpiredError") {
+            res.status(401).json({ error: "Token expired" });
+            return;
+        }
+
+        console.error("Authentication middleware error:", error);
+        res.status(500).json({ error: "Internal server error" });
+        return;
     }
-}
+};
