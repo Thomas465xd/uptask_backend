@@ -122,7 +122,10 @@ export class AuthController {
                 return;
             }
 
-            const token = generateJWT()
+            /** Generate JWT for Auth */
+            const token = generateJWT({
+                id: user.id
+            })
 
             res.status(200).json({ 
                 message: "Login successful", 

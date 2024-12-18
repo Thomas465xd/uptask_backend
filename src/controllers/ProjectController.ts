@@ -37,6 +37,10 @@ export class ProjectController {
     // Create a Project
     static createProject = async (req: Request, res: Response) => {
         const project = new Project(req.body);
+        // console.log(req.user)
+
+        /** Add the manager to the project */
+        project.manager = req.user.id
 
         try {
             await project.save();
