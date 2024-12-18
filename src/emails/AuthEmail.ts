@@ -126,7 +126,7 @@ export class AuthEmail {
                             padding: 12px 24px;
                             border-radius: 5px;
                             font-weight: bold;
-                            margin-top: 30px;
+                            margin-top: 10px;
                             margin-bottom: 30px;
                             transition: background-color 0.3s ease-in-out;
                         }
@@ -149,11 +149,23 @@ export class AuthEmail {
                             <h1>Reset Your Password</h1>
                         </div>
                         <div class="content">
-                            <p>Hello <strong>${user.name}</strong>,</p>
-                            <p>Click the button below to reset your password:</p>
+                            <p style="font-size: 16px; color: #333333; margin: 0;">
+                                Hello <strong>${user.name}</strong>,<br><br>
+                                Click the button below and enter the <strong>6-digit code</strong> to confirm your account:
+                            </p>
+                            <!-- Token Code -->
+                            <p style="margin: 20px 0; font-size: 24px; font-weight: bold; letter-spacing: 3px; color: #007bff;">
+                                ${user.token}
+                            </p>
                             <a href="${process.env.FRONTEND_URL}/auth/reset-password" class="button">
                                 Reset Password
                             </a>
+                            <p style="font-size: 16px; color: #333333;">
+                                After clicking the button, enter the above code on the confirmation page to activate your account.
+                            </p>
+                            <p>
+                                This token expires in 10 minutes
+                            </p>
                             <p>If you did not request a password reset, please ignore this email.</p>
                         </div>
                         <div class="footer">

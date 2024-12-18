@@ -6,6 +6,7 @@ import Token from "../models/Token";
 import { generateToken } from "../utils/token";
 import { transporter } from "../config/nodemailer";
 import { AuthEmail } from "../emails/AuthEmail";
+import { generateJWT } from "../utils/jwt";
 
 export class AuthController {
 
@@ -114,14 +115,19 @@ export class AuthController {
 
             const isMatch = await comparePassword(password, user.password);
 
+            /** Check if the passwords match */
             if(!isMatch) {
                 const error = new Error("Invalid Credentials");
                 res.status(401).json({ message: error.message });
                 return;
             }
 
-            res.status(200).json({ message: "Login successful" });
+            const token = generateJWT()
 
+            res.status(200).json({ 
+                message: "Login successful", 
+                token 
+            });
         } catch (error) {
             const errorMessage = error.message || "Internal server error";
             res.status(500).json({ message: errorMessage });
@@ -197,6 +203,50 @@ export class AuthController {
             })
 
             res.status(200).json({ message: "Reset password email sent successfully" });
+        } catch (error) {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    static validateToken = async (req: Request, res: Response) => {
+        try {
+            const { token } = req.body
+            const tokenExists = await Token.findOne({ token }); 
+
+            if(!tokenExists) {
+                const error = new Error("Invalid Token")
+                res.status(404).json({ message: error.message });
+                return;
+            }
+
+            res.status(200).json({ message: "Token is valid, set-up your new password" });
+        } catch (error) {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    static resetPasswordWithToken = async (req: Request, res: Response) => {
+        try {
+            const { token } = req.params
+            const { password } = req.body
+
+            const tokenExists = await Token.findOne({ token }); 
+
+            if(!tokenExists) {
+                const error = new Error("Invalid or expired token, try again")
+                res.status(404).json({ message: error.message });
+                return;
+            }
+
+            const user = await User.findById(tokenExists.user);
+            user.password = await hashPassword(password);
+
+            await Promise.allSettled([
+                user.save(), 
+                tokenExists.deleteOne(),
+            ])
+
+            res.status(200).json({ message: "Password reset successful, you can now log in" });
         } catch (error) {
             res.status(500).json({ message: "Internal server error" });
         }
