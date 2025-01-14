@@ -6,6 +6,7 @@ import { TaskController } from "../controllers/TaskController";
 import { projectExists } from "../middleware/project";
 import { taskBelongsToProject, taskExists } from "../middleware/task";
 import { authenticate } from "../middleware/auth";
+import { TeamMemberController } from "../controllers/TeamController";
 
 const router = Router();
 
@@ -116,4 +117,44 @@ router.delete("/:projectId/tasks/:taskId",
     TaskController.deleteTask
 )
 
+/** ROUTES FOR TEAMS */
+
+// Get team members
+router.get("/:projectId/team", 
+    TeamMemberController.getProjectTeam
+)
+
+// Get team member by id
+router.get("/:projectId/team/:id", 
+    param("id")
+        .isMongoId().withMessage("Invalid userId"),
+    handleInputErrors,
+    TeamMemberController.getTeamMemberById
+)
+
+// Find member by email
+router.post("/:projectId/team/find", 
+    body("email")
+        .isEmail().toLowerCase().withMessage("Invalid email"),
+    handleInputErrors,
+    TeamMemberController.findMemberByEmail 
+)
+
+// Add member to team
+router.post("/:projectId/team/add",
+    body("id")
+        .isMongoId().withMessage("Invalid userId"),
+    handleInputErrors,
+    TeamMemberController.addMemberToTeam
+)
+
+// Remove member from team
+router.delete("/:projectId/team/remove", 
+    body("id")
+        .isMongoId().withMessage("Invalid userId"),
+    handleInputErrors,
+    TeamMemberController.removeMemberFromTeam
+)
+
+// Export the router
 export default router

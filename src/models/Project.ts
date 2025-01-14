@@ -8,6 +8,7 @@ export interface ProjectInterface extends Document {
     clientName: string, 
     tasks: PopulatedDoc<TaskInterface & Document>[], 
     manager: PopulatedDoc<UserInterface & Document>
+    team: PopulatedDoc<UserInterface & Document>[]
 }
 
 const ProjectSchema: Schema = new Schema({
@@ -35,7 +36,13 @@ const ProjectSchema: Schema = new Schema({
     manager: {
         type: Types.ObjectId,
         ref: "User"
-    }
+    }, 
+    team: [
+        {
+            type: Types.ObjectId, 
+            ref: "User"
+        }
+    ]
 }, {timestamps: true})
 
 const Project = mongoose.model<ProjectInterface>("Project", ProjectSchema);
