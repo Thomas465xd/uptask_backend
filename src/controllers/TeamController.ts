@@ -86,16 +86,16 @@ export class TeamMemberController {
     // Remove a member from the team
     static removeMemberFromTeam = async (req: Request, res: Response) => {
         try {
-            const { id } = req.body
+            const { userId } = req.params;
 
             // Check if the user is already in the team
-            if(!req.project.team.some(member => member.toString() === id.toString())) { 
+            if(!req.project.team.some(member => member.toString() === userId.toString())) { 
                 const error = new Error("User does not exist in the project");
                 res.status(409).send({error: error.message});
                 return;
             }
 
-            req.project.team = req.project.team.filter( teamMember => teamMember.toString() !== id.toString() );
+            req.project.team = req.project.team.filter( teamMember => teamMember.toString() !== userId.toString() );
     
             await req.project.save();
             
@@ -103,6 +103,6 @@ export class TeamMemberController {
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: "Internal server error" });
-        }
+        } 
     }
 }
