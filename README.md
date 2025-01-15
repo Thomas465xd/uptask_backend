@@ -1,12 +1,12 @@
-# Uptask Backend  
+# Uptask Backend 📲
 
 A robust RESTful API built with **Node.js**, **Express**, **TypeScript**, and **MongoDB** for managing projects and tasks in a to-do list application. This backend supports CRUD operations for projects and tasks, along with user authentication and two-factor authentication using JWT.  
 
 ⚠️ **Note:** This project is under active development and subject to changes as features are refined and added.  
 
 ---
-
-## Features  
+ 
+## Features 🚨
 
 - **CRUD Operations**:  
   - Create, retrieve, update, and delete projects.  
@@ -21,7 +21,7 @@ A robust RESTful API built with **Node.js**, **Express**, **TypeScript**, and **
 
 ---
 
-## Installation  
+## Installation ⬇️
 
 1. Clone this repository:  
    ```bash
@@ -53,21 +53,21 @@ A robust RESTful API built with **Node.js**, **Express**, **TypeScript**, and **
 - `PUT /api/projects/:id` – Update a project by ID.
 - `DELETE /api/projects/:id` – Delete a project by ID.
 
-## Tasks
+## Tasks ✅
 
 - POST /api/projects/:projectId/tasks – Add a new task to a project.
 - GET /api/projects/:projectId/tasks – Get all tasks in a project.
 - PUT /api/projects/:projectId/tasks/:taskId – Update a task in a project.
 - DELETE /api/projects/:projectId/tasks/:taskId – Delete a task from a project.
 
-## Authentication
+## Authentication 👮
 - POST /api/auth/register – Register a new user.
 - POST /api/auth/login – User login with JWT-based authentication.
 - POST /api/auth/2fa – Verify two-factor authentication token.
 
 ---
 
-##Technologies
+## Technologies 🚀
 
 - Node.js – Server-side JavaScript runtime.
 - Express.js – Web framework for building RESTful APIs.
@@ -77,13 +77,13 @@ A robust RESTful API built with **Node.js**, **Express**, **TypeScript**, and **
 
 ---
 
-## Roadmap
+## Roadmap 🗺️
 
 ## Current Features:
-- CRUD for projects and tasks.
+- CRUD for projects and tasks. 
 - Basic user authentication and JWT-based 2FA.
 
-## Planned Enhancements:
+## Planned Enhancements: 
 - Advanced error handling.
 - Role-based access control (RBAC).
 - Unit and integration tests with Jest.
@@ -91,7 +91,7 @@ A robust RESTful API built with **Node.js**, **Express**, **TypeScript**, and **
 
 ---
 
-## License
+## License 🪪
 This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for details.
 
 ---
