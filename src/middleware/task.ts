@@ -35,3 +35,12 @@ export function taskBelongsToProject( req: Request, res: Response, next: NextFun
     }
     next()
 }
+
+export function isManager( req: Request, res: Response, next: NextFunction ) {
+    if( req.user.id.toString() !== req.project.manager.toString() ) {
+        const error = new Error("Action not allowed")
+        res.status(403).json({ error: error.message })
+        return
+    }
+    next()
+}

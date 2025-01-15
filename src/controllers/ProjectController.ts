@@ -9,6 +9,7 @@ export class ProjectController {
             const projects = await Project.find({
                 $or: [
                     { manager: {$in: req.user.id} }, // Projects where the user is the manager
+                    {team: {$in: req.user.id}} // Projects where the user is a team member
                 ]
             });
             res.status(200).json(projects);  // Respuesta con código 200 OK
@@ -31,7 +32,7 @@ export class ProjectController {
                 return;
             }
 
-            if(project.manager.toString() !== req.user.id.toString()) {
+            if(project.manager.toString() !== req.user.id.toString() && !project.team.includes(req.user.id.toString())) {
                 const error = new Error("Action not allowed");
                 res.status(403).json({ error: error.message });
                 return;
