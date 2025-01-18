@@ -9,7 +9,7 @@ export class TaskController {
         try {
             const tasks = await Task.find({ project: req.project.id }).populate("project");
             res.json(tasks);
-        } catch (error) {
+        } catch (error) { 
             res.status(500).json({ error: "Internal server error" });
         }
     }
@@ -17,7 +17,10 @@ export class TaskController {
     // Get task by Id
     static getTaskById = async (req: Request, res: Response) => {
         try {
-            const task = req.task
+            const task = await Task.findById(req.task.id).populate({
+                path: "completedBy.user", 
+                select: "id name email"
+            })
 
             res.json(task);
         } catch (error) {
@@ -48,6 +51,13 @@ export class TaskController {
 
             const { status } = req.body
             task.status = status
+
+            const data = {
+                user: req.user.id, 
+                status: status
+            }
+            
+            task.completedBy.push(data)
 
             await req.task.save()
 

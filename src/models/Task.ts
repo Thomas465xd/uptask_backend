@@ -12,9 +12,13 @@ export type taskStatus = typeof taskStatus[keyof typeof taskStatus]
 
 export interface TaskInterface extends Document {
     taskName: string;
-    taskDescription: string;
+    taskDescription: string; 
     project: Types.ObjectId;
     status: taskStatus;
+    completedBy: {
+        user: Types.ObjectId;
+        status: taskStatus;
+    }[];
 }
 
 export const TaskSchema: Schema = new Schema({
@@ -37,7 +41,21 @@ export const TaskSchema: Schema = new Schema({
         type: String,
         enum: Object.values(taskStatus),
         default: taskStatus.PENDING
-    }
+    }, 
+    completedBy: [
+        {
+            user: {
+                type: Schema.Types.ObjectId, 
+                ref: "User", 
+                default: null
+            }, 
+            status: {
+                type: String, 
+                enum: Object.values(taskStatus), 
+                default: taskStatus.PENDING
+            }
+        }
+    ]
 }, {timestamps: true})
 
 const Task = mongoose.model<TaskInterface>("Task", TaskSchema);
