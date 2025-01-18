@@ -164,13 +164,11 @@ router.delete("/:projectId/team/:userId",
 
 // Get all notes from a task
 router.get("/:projectId/tasks/:taskId/notes", 
-
+    handleInputErrors,
+    NoteController.getTaskNote
 )
 
-// Get note by Id
-router.get("/:projectId/tasks/:taskId/notes/:noteId",
-    
-)
+//? Get note by Id - Enpoind will not be created, bc getTaskById is configured to retrieve note info 
 
 // Create a Note
 router.post("/:projectId/tasks/:taskId/notes/create",
@@ -180,15 +178,20 @@ router.post("/:projectId/tasks/:taskId/notes/create",
     NoteController.createNote
 )
 
+// Delete a Note
+router.delete("/:projectId/tasks/:taskId/notes/:noteId/delete",
+    param("noteId")
+        .isMongoId().withMessage("Invalid Id"),
+    handleInputErrors, 
+    NoteController.deleteNote
+)
+
 //  Update a Note
+/** 
 router.put("/:projectId/tasks/:taskId/notes/:noteId/update",
     
 )
-
-// Delete a Note
-router.delete("/:projectId/tasks/:taskId/notes/:noteId/delete",
-    
-)
+*/
 
 // Export the router
 export default router
