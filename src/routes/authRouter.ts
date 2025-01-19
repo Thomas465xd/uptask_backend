@@ -79,10 +79,39 @@ router.post("/reset-password/:token",
     AuthController.resetPasswordWithToken
 )
 
+/** Profile & User */
+
 router.get("/user", 
     authenticate,
     handleInputErrors, 
     AuthController.getUser
+)
+
+router.put("/profile", 
+    authenticate,
+    body("name")
+        .notEmpty().withMessage("name is required"),
+    body("email")
+        .notEmpty().withMessage("email is required")
+        .isEmail().withMessage("email is not valid"),
+    handleInputErrors, 
+    AuthController.updateProfile
+)
+
+router.post("/update-password", 
+    authenticate,
+    body("current_password")
+        .notEmpty().withMessage("Current Password is required"),
+    body("password")
+        .isLength({ min: 8 }).withMessage("Password must be at least 8 characters long").trim(), 
+    body("confirmPassword").custom((value, { req }) => {
+        if(value !== req.body.password) {
+            throw new Error("Passwords do not match")
+        }
+        return true
+    }), 
+    handleInputErrors, 
+    AuthController.updateUserPassword
 )
 
 export default router
