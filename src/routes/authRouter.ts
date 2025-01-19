@@ -114,4 +114,13 @@ router.post("/update-password",
     AuthController.updateUserPassword
 )
 
-export default router
+// 
+router.post("/check-password", 
+    authenticate, 
+    body("password")
+        .notEmpty().withMessage("Password is required"),
+    handleInputErrors, 
+    AuthController.checkPasswordForActions
+)
+
+export default router 

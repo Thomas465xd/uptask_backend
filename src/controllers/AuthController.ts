@@ -291,7 +291,6 @@ export class AuthController {
 
     static updateUserPassword = async (req: Request, res: Response) => {
         try {
-            console.log(req.body)
             const { current_password, password } = req.body
 
             const user = await User.findById(req.user.id)
@@ -307,6 +306,26 @@ export class AuthController {
             await user.save()
 
             res.status(200).json({message: "Password Updated Successfully"})
+
+        } catch (error) {
+            res.status(500).json({ message: "Internal server error" });
+        }
+    }
+
+    static checkPasswordForActions = async (req: Request, res: Response) => {
+        try {
+            const { password } = req.body
+
+            const user = await User.findById(req.user.id)
+
+            const isPasswordCorrect = await comparePassword(password, user.password)
+            if(!isPasswordCorrect) {
+                const error = new Error("Current Password is incorrect")
+                res.status(401).json({error: error.message})
+                return
+            }
+
+            res.status(200).json({message: "Action Allowed"})
 
         } catch (error) {
             res.status(500).json({ message: "Internal server error" });
