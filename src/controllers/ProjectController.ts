@@ -26,12 +26,6 @@ export class ProjectController {
             const { id } = req.params
             const project = await Project.findById(id).populate("tasks");
 
-            if(!project) {
-                const error = new Error("Project not found");
-                res.status(404).json({ error: error.message });
-                return;
-            }
-
             if(project.manager.toString() !== req.user.id.toString() && !project.team.includes(req.user.id.toString())) {
                 const error = new Error("Action not allowed");
                 res.status(403).json({ error: error.message });
@@ -68,12 +62,6 @@ export class ProjectController {
         try {
             const project = req.project
 
-            if(project.manager.toString() !== req.user.id.toString()) {
-                const error = new Error("Only the Manager can update the project");
-                res.status(403).json({ error: error.message });
-                return;
-            }
-
             project.projectName = req.body.projectName;
             project.projectDescription = req.body.projectDescription;
             project.clientName = req.body.clientName;
@@ -88,22 +76,9 @@ export class ProjectController {
 
     // Delete a Project by its Id
     static deleteProject = async (req: Request, res: Response) => {
-        const { id } = req.params
 
         try {
-            const project = await Project.findById(id);
-
-            if(!project) {
-                const error = new Error("Project not found");
-                res.status(404).json({ error: error.message });
-                return;
-            }
-
-            if(project.manager.toString() !== req.user.id.toString()) {
-                const error = new Error("Only the Manager can delete the project");
-                res.status(403).json({ error: error.message });
-                return;
-            }
+            const project = req.project;
 
             await project.deleteOne();
             res.status(200).json({ message: "Project deleted successfully" });

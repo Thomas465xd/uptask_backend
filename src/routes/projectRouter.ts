@@ -16,6 +16,9 @@ router.use(authenticate);
 
 /* Routes for Projects */
 router.param("id", projectExists);
+router.param("projectId", projectExists);
+router.param("taskId", taskExists);
+router.param("taskId", taskBelongsToProject);
 
 // Get all projects
 router.get("/", ProjectController.getAllProjects);
@@ -49,6 +52,7 @@ router.put("/:id",
     body("clientName")
         .notEmpty().withMessage("clientName is required"),
     handleInputErrors, 
+    isManager,
     ProjectController.updateProject
 );
 
@@ -56,13 +60,11 @@ router.put("/:id",
 router.delete("/:id",
     param("id").isMongoId().withMessage("Invalid ID"),
     handleInputErrors, 
+    isManager,
     ProjectController.deleteProject
 );
 
 /* Routes for Tasks */
-router.param("projectId", projectExists);
-router.param("taskId", taskExists);
-router.param("taskId", taskBelongsToProject);
 
 // Get all tasks from a project
 router.get("/:projectId/tasks", 

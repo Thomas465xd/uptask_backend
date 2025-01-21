@@ -276,8 +276,6 @@ export class AuthController {
                 return
             }
 
-
-
             user.name = name 
             user.email = email
 

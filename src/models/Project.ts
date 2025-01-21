@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document, PopulatedDoc, Types } from "mongoose";
-import { TaskInterface } from "./Task";
+import Task, { TaskInterface } from "./Task";
 import { UserInterface } from "./User";
+import Note from "./Note";
 
 export interface ProjectInterface extends Document {
     projectName: string, 
@@ -44,6 +45,24 @@ const ProjectSchema: Schema = new Schema({
         }
     ]
 }, {timestamps: true})
+
+// Middleware to delete all notes related to a task
+ProjectSchema.pre("deleteOne", { document: true, query: false }, async function() {
+    const projectId = this._id
+    if(!projectId) return
+    
+    const tasks = await Task.find({
+        project: projectId
+    })
+
+    for(const task of tasks) {
+        await Note.deleteMany({task: task._id})
+    }
+
+    await Task.deleteMany({project: projectId})
+    //console.log(this)
+})
+
 
 const Project = mongoose.model<ProjectInterface>("Project", ProjectSchema);
 
